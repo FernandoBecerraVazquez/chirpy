@@ -3,15 +3,16 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 )
+
+type validateChirpResponse struct {
+	CleanedBody string `json:"cleaned_body"`
+}
 
 func handlerValidateChirp(w http.ResponseWriter, r *http.Request) {
 	type requestBody struct {
 		Body string `json:"body"`
-	}
-
-	type Success struct {
-		Valid bool `json:"valid"`
 	}
 
 	decoder := json.NewDecoder(r.Body)
@@ -27,7 +28,9 @@ func handlerValidateChirp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	msg := Success{Valid: true}
+	cleanedBody := cleanBody(params.Body)
+
+	msg := validateChirpResponse{CleanedBody: cleanedBody}
 	respondWithJSON(w, 200, msg)
 }
 
@@ -40,6 +43,7 @@ func respondWithError(w http.ResponseWriter, code int, msg string) {
 	respondWithJSON(w, code, payload)
 
 }
+
 func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	data, err := json.Marshal(payload)
 	if err != nil {
@@ -51,4 +55,20 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(code)
 	w.Write(data)
+}
+
+func cleanBody(body string) string {
+	wordsList := strings.Split(body, " ")
+	for i, word := range wordsList {
+		lowercaseWord := strings.ToLower(word)
+		switch lowercaseWord {
+		case "kerfuffle":
+			wordsList[i] = "****"
+		case "sharbert":
+			wordsList[i] = "****"
+		case "fornax":
+			wordsList[i] = "****"
+		}
+	}
+	return strings.Join(wordsList, " ")
 }
