@@ -10,7 +10,7 @@ type validateChirpResponse struct {
 	CleanedBody string `json:"cleaned_body"`
 }
 
-func handlerValidateChirp(w http.ResponseWriter, r *http.Request) {
+func (apiCfg *apiConfig) handlerValidateChirp(w http.ResponseWriter, r *http.Request) {
 	type requestBody struct {
 		Body string `json:"body"`
 	}
